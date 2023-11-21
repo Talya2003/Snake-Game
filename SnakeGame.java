@@ -10,6 +10,11 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
     public void actionPerformed(ActionEvent e) {
         move_location();
         repaint();
+
+        //game over
+        if (game_over) {
+            time.stop();
+        }
     }
 
     @Override
@@ -67,14 +72,14 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
     Timer time;
 
     int speed_x , speed_y;
-    
+
     boolean game_over;
 
     //constructor
     SnakeGame(int width_board , int height_board) {
         this.width_board = width_board;
         this.height_board = height_board;
-        
+
         setPreferredSize(new Dimension(this.width_board , this.height_board));
         setBackground(Color.BLACK);
 
@@ -114,7 +119,7 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
         g.fillRect(snake_head.x*dice_size , snake_head.y*dice_size , dice_size , dice_size);
 
         //draw the body of te snake
-        for (int i = 0; i < snake.size(); i++) { //We will go through all the squares of the snake's body, that is, we will go through the entire snake array, and color them each separately.
+        for (int i = 0; i < snake.size()-1; i++) { //We will go through all the squares of the snake's body, that is, we will go through the entire snake array, and color them each separately.
             Dice part_of_snake = snake.get(i); //catch one of the dices of the snake
             g.fillRect(part_of_snake.x*dice_size , part_of_snake.y*dice_size , dice_size , dice_size); //draw this part (dice)
         }
@@ -122,6 +127,18 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
         //draw the apple
         g.setColor(Color.red);
         g.fillRect(apple.x*dice_size , apple.y*dice_size , dice_size , dice_size);
+
+        //score
+        g.setFont(new Font("Calibri" , Font.PLAIN , 18));
+        if (game_over) {
+            g.setColor(Color.red);
+            g.drawString("Game Over: " + String.valueOf(snake.size()) , dice_size - 16 , dice_size);
+        }
+
+        else {
+            g.setColor(Color.green);
+            g.drawString("Score: " + String.valueOf(snake.size()) , dice_size - 16 , dice_size);
+        }
     }
 
     public void apple_location() {
@@ -165,6 +182,19 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
         //the snake
         snake_head.x += speed_x;
         snake_head.y += speed_y;
+
+        //game over
+        for (int i = 0; i < snake.size(); i++) {
+            Dice part_of_snake = snake.get(i);
+            //check if it stacks with the head of the snake
+            if(stuck(snake_head , part_of_snake)) {
+                game_over = true;
+            }
+        }
+
+        if (snake_head.x*dice_size < 0 || snake_head.x*dice_size > width_board || snake_head.y*dice_size < 0 || snake_head.y*dice_size > height_board) {
+            game_over = true;
+        }
     }
 
 }
