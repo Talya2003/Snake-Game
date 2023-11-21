@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class App {
 
@@ -18,5 +19,8 @@ public class App {
         SnakeGame snakeGame = new SnakeGame(width_board , height_board);
         frame.add(snakeGame);
         frame.pack();
+
+        snakeGame.requestFocus();
     }
+
 }
