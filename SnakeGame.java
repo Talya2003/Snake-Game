@@ -59,24 +59,33 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
     int width_board;
     int height_board;
     int dice_size = 25;
-    Dice snake_head; //this is the snake
+    Dice snake_head; //this is the head of snake (the beginning status)
+    ArrayList<Dice> snake; // this is the body of the snake
     Dice apple;
     Random random_location;
 
     Timer time;
 
     int speed_x , speed_y;
+    
+    boolean game_over;
 
+    //constructor
     SnakeGame(int width_board , int height_board) {
         this.width_board = width_board;
         this.height_board = height_board;
+        
         setPreferredSize(new Dimension(this.width_board , this.height_board));
         setBackground(Color.BLACK);
+
+        this.game_over = false;
 
         addKeyListener(this);
         setFocusable(true);
 
         snake_head = new Dice(5,5);
+        snake = new ArrayList<>();
+
         apple = new Dice(10,10);
         random_location = new Random();
         apple_location();
@@ -104,6 +113,12 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
         g.setColor(Color.green);
         g.fillRect(snake_head.x*dice_size , snake_head.y*dice_size , dice_size , dice_size);
 
+        //draw the body of te snake
+        for (int i = 0; i < snake.size(); i++) { //We will go through all the squares of the snake's body, that is, we will go through the entire snake array, and color them each separately.
+            Dice part_of_snake = snake.get(i); //catch one of the dices of the snake
+            g.fillRect(part_of_snake.x*dice_size , part_of_snake.y*dice_size , dice_size , dice_size); //draw this part (dice)
+        }
+
         //draw the apple
         g.setColor(Color.red);
         g.fillRect(apple.x*dice_size , apple.y*dice_size , dice_size , dice_size);
@@ -114,7 +129,39 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
         apple.y = random_location.nextInt(height_board/dice_size);
     }
 
+    public boolean stuck(Dice dice_1 , Dice dice_2) {
+        // check if those two dices are in the same place --> if it is true == there is a stuck
+        return (dice_1.x == dice_2.x && dice_1.y == dice_2.y);
+    }
+
     public void move_location() {
+        //check if there is a stuck == if it is true == eats the apple
+        if (stuck(snake_head , apple)) {
+            Dice dice_adding = new Dice(apple.x , apple.y);
+            //add the location of the apple to the snake
+            snake.add(dice_adding);
+            //find a new location for the apple
+            apple_location();
+        }
+
+        //the body of the snake
+        //We will want to join together all the parts of the snake that are added to it
+        for (int i = 0; i < snake.size()-1; i++) {
+            Dice part_of_snake = snake.get(i);
+            //If it is the first part of the snake - we will define the position to be the position of the head of the snake
+            if(i == 0) {
+                part_of_snake.x = snake_head.x;
+                part_of_snake.y = snake_head.y;
+            }
+
+            //Otherwise, we will grab the previous part, and paint this place
+            else {
+                Dice previous_part = snake.get(i-1);
+                part_of_snake.x = previous_part.x;
+                part_of_snake.y = previous_part.y;
+            }
+        }
+
         //the snake
         snake_head.x += speed_x;
         snake_head.y += speed_y;
