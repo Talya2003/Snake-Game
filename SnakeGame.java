@@ -20,6 +20,8 @@ public class SnakeGame extends JPanel implements ActionListener , KeyListener{
     @Override
     public void keyPressed(KeyEvent e) {
         //move the snake & validation
+        //Checks what type of key was pressed from the keyboard and checks that it is indeed possible to move forward and that the snake did 
+        //not reach beyond the edges of the game's screen because this is a disqualification
         if (e.getKeyCode() == KeyEvent.VK_UP && speed_y != 1) {
             speed_x = 0;
             speed_y = -1;
